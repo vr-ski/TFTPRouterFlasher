@@ -1,0 +1,43 @@
+name: Lint and Type Check
+
+on:
+  push:
+    paths:
+      - "**.py"
+      - "ruff.toml"
+      - "pyproject.toml"
+      - "requirements*.txt"
+  pull_request:
+    paths:
+      - "**.py"
+      - "ruff.toml"
+      - "pyproject.toml"
+      - "requirements*.txt"
+
+jobs:
+  lint-typecheck:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-dev.txt
+
+      - name: Run Ruff
+        run: ruff check . --fix
+
+      - name: Run Ruff format
+        run: ruff format . --check
+      
+      - name: Run mypy
+        run: mypy .
+
