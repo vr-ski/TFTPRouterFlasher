@@ -1,0 +1,12 @@
+line-length = 88
+target-version = "py311"
+
+[lint]
+select = ["E", "F", "I", "B", "ANN"]  # Example: pycodestyle, pyflakes, isort, bugbear, flake8-annotations rules
+ignore = ["E501"]              # Example: ignore line length errors
+
+[format]
+quote-style = "double"          # Use double quotes for strings
+indent-style = "space"          # Use spaces instead of tabs
+line-ending = "auto"            # Match platform default
+

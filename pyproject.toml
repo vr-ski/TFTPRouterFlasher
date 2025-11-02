@@ -1,0 +1,44 @@
+[build-system]
+requires = ["setuptools>=69.4.2", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "tftp-router-flasher"
+version = "0.0.1"
+description = "Firmware rescue and flashing tool for routers via TFTP"
+readme = "README.md"
+requires-python = ">=3.8"
+license = { text = "GPL-2.0" }
+authors = [
+  { name = "Modernized by vr-ski" }
+]
+dependencies = [
+  "tftpy==0.8.6",
+  "psutil==7.1.2"
+]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Programming Language :: Python :: 3",
+  "License :: OSI Approved :: GNU General Public License v2 (GPLv2)",
+  "Operating System :: POSIX :: Linux",
+  "Operating System :: MacOS",
+  "Environment :: Console",
+  "Intended Audience :: Developers",
+  "Topic :: System :: Networking",
+  "Topic :: Utilities"
+]
+
+[project.urls]
+Homepage = "https://github.com/vr-ski/TFTPRouterFlasher"
+Source = "https://github.com/vr-ski/TFTPRouterFlasher"
+Issues = "https://github.com/vr-ski/TFTPRouterFlasher/issues"
+
+[project.scripts]
+tftp-router-flasher = "tftp_router_flasher.main:main"
+
+[tool.setuptools]
+package-dir = { "" = "src" }
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
