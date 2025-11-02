@@ -1,0 +1,6 @@
+-r requirements.txt  # Include all runtime dependencies
+
+# Dev-only tools
+ruff
+mypy
+pre-commit
