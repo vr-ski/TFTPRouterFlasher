@@ -32,11 +32,11 @@ def setup_logger(debug_enabled: bool) -> logging.Logger:
     return logger
 
 
-def validate_interface(interface: str) -> str:
+def validate_interface(interface: str) -> bool:
     return interface in psutil.net_if_addrs()
 
 
-def get_ip_info(interface: str) -> list[str]:
+def get_ip_info(interface: str) -> tuple[str, str]:
     result = subprocess.run(
         ["ip", "-4", "addr", "show", interface], capture_output=True, text=True
     )
@@ -45,7 +45,7 @@ def get_ip_info(interface: str) -> list[str]:
             ip = line.strip().split()[1].split("/")[0]
             netmask = line.strip().split()[1].split("/")[1]
             return ip, netmask
-    return None, None
+    return "", ""
 
 
 def get_default_gateway() -> str:
@@ -53,7 +53,7 @@ def get_default_gateway() -> str:
     for line in result.stdout.splitlines():
         if line.startswith("default"):
             return line.split()[2]
-    return None
+    return ""
 
 
 def print_connection_info(
@@ -144,7 +144,7 @@ def upload_firmware(
     if ans != "y":
         return False
 
-    return try_default_ip_range(interface, firmware, timeout, logger)
+    return try_default_ip_range(interface, firmware, timeout, no_ping, logger)
 
 
 def main() -> None:
