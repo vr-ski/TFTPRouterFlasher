@@ -36,11 +36,14 @@ jobs:
           pip install -r requirements-dev.txt
 
       - name: Run Ruff
+        if: ${{ !cancelled() && steps.install.conclusion == 'success' }}
         run: ruff check . --fix
 
       - name: Run Ruff format
+        if: ${{ !cancelled() && steps.install.conclusion == 'success' }}
         run: ruff format . --check
       
       - name: Run mypy
+        if: ${{ !cancelled() && steps.install.conclusion == 'success' }}
         run: mypy .
 
