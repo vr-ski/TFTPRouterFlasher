@@ -16,7 +16,7 @@ def setup_logger(debug_enabled: bool) -> logging.Logger:
     logger = logging.getLogger("TFTPRouterFlasher")
     logger.setLevel(logging.DEBUG if debug_enabled else logging.INFO)
 
-    formatte = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
+    formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
 
     ch = logging.StreamHandler()
     ch.setLevel(logging.DEBUG if debug_enabled else logging.INFO)
