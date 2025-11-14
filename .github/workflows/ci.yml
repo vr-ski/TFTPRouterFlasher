@@ -40,7 +40,7 @@ jobs:
   ruff-check:
       - <<: *install-dependencies
       - name: Run Ruff Check
-        run: ruff check . --fix
+yyr        run: ruff check . --fix
   ruff-format:
     runs-on: ubuntu-latest
     steps:
