@@ -18,7 +18,7 @@ jobs:
       - name: Run Ruff Check
         run: ruff check . --fix
 
-ruff-format:
+  ruff-format:
     runs-on: ubuntu-latest
     steps:
       - uses: ./.github/actions/setup-python
