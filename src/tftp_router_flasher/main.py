@@ -20,7 +20,7 @@ def setup_logger(debug_enabled: bool) -> logging.Logger:
 
     ch = logging.StreamHandler()
     ch.setLevel(logging.DEBUG if debug_enabled else logging.INFO)
-        ch.setFormatter(formatter)
+    ch.setFormatter(formatter)
 
         fh = logging.FileHandler("TFTPRouterFlasher.log")
     fh.setLevel(logging.DEBUG)
