@@ -1,5 +1,7 @@
 name: Lint and Type Check
 
+strategy:
+  fail-fast: false
 on:
   push:
     paths:
@@ -17,8 +19,6 @@ on:
 jobs:
   lint-typecheck:
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
     steps:
       - name: Checkout code
         uses: actions/checkout@v5
