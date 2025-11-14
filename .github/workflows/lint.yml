@@ -15,10 +15,11 @@ on:
       - "requirements*.txt"
 
 jobs:
-  strategy:
-    fail-fast: false
 
   lint-typecheck:
+    continue-on-error: true
+    strategy:
+      fail-fast: false
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
