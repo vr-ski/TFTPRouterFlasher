@@ -16,6 +16,12 @@ on:
       - "requirements*.txt"
       - ".github/workflows/*.yml"
 
+# Define reusable steps as anchors
+defaults:
+  run:
+    shell: bash
+
+# Anchor definitions
 step-anchors: &install-dependencies
       - name: Checkout code
         uses: actions/checkout@v5
