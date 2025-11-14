@@ -1,0 +1,25 @@
+name: 'Python Setup'
+description: 'Setup Python and install dependencies'
+inputs:
+  python-version:
+    description: 'Python version'
+    required: false
+    default: '3.11'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Set up Python ${{ inputs.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ inputs.python-version }}
+
+    - name: Upgrade pip
+      shell: bash
+      run: |
+        python -m pip install --upgrade pip
+
+    - name: Install dependencies
+      shell: bash
+      run: |
+        pip install -r requirements-dev.txt
