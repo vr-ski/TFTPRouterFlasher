@@ -19,8 +19,12 @@ jobs:
   lint-typecheck:
     continue-on-error: true
     strategy:
+      max-parallel: 3
+      matrix:
+        os: [ubuntu-latest]
+        node: [14, 16, 18]
       fail-fast: false
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v5
@@ -36,14 +40,11 @@ jobs:
           pip install -r requirements-dev.txt
 
       - name: Run Ruff
-        if: ${{ !cancelled() && steps.install.conclusion == 'success' }}
         run: ruff check . --fix
 
       - name: Run Ruff format
-        if: ${{ !cancelled() && steps.install.conclusion == 'success' }}
         run: ruff format . --check
       
       - name: Run mypy
-        if: ${{ !cancelled() && steps.install.conclusion == 'success' }}
         run: mypy .
 
