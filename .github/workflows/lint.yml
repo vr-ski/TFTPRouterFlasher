@@ -7,17 +7,16 @@ on:
       - "ruff.toml"
       - "pyproject.toml"
       - "requirements*.txt"
+      - ".github/workflows/*.yml"
   pull_request:
     paths:
       - "**.py"
       - "ruff.toml"
       - "pyproject.toml"
       - "requirements*.txt"
+      - ".github/workflows/*.yml"
 
-jobs:
-  ruff-check:
-    runs-on: ubuntu-latest
-    steps:
+step-anchors: &install-dependencies
       - name: Checkout code
         uses: actions/checkout@v5
 
@@ -30,39 +29,21 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements-dev.txt
+
+jobs:
+  ruff-check:
+      - <<: *install-dependencies
       - name: Run Ruff Check
         run: ruff check . --fix
   ruff-format:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v5
-
-      - name: Set up Python
-        uses: actions/setup-python@v6
-        with:
-          python-version: "3.11"
-
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements-dev.txt
+      - <<: *install-dependencies
       - name: Run Ruff format
         run: ruff format . --check
   mypy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v5
-
-      - name: Set up Python
-        uses: actions/setup-python@v6
-        with:
-          python-version: "3.11"
-
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements-dev.txt
+      - <<: *install-dependencies
       - name: Run mypy
         run: mypy .
