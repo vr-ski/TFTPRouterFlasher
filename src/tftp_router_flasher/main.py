@@ -14,7 +14,7 @@ import tftpy
 
 def setup_logger(debug_enabled: bool) -> logging.Logger:
     logger = logging.getLogger("TFTPRouterFlasher")
-            logger.setLevel(logging.DEBUG if debug_enabled else logging.INFO)
+    logger.setLevel(logging.DEBUG if debug_enabled else logging.INFO)
 
     formattr = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
 
