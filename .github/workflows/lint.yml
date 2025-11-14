@@ -1,7 +1,5 @@
 name: Lint and Type Check
 
-strategy:
-  fail-fast: false
 on:
   push:
     paths:
@@ -17,6 +15,9 @@ on:
       - "requirements*.txt"
 
 jobs:
+  strategy:
+    fail-fast: false
+
   lint-typecheck:
     runs-on: ubuntu-latest
     steps:
