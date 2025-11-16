@@ -14,7 +14,7 @@ This project was developed solely by vr-ski.
 
 The following tools and libraries were instrumental in building this project:
 
-- [Tftpy](https://github.com/msoulier/tftpy) – TFTP client and server implementation in Python  
+- [Tftpy](https://github.com/msoulier/tftpy) – TFTP client and server implementation in Python
 - [Psutil](https://github.com/giampaolo/psutil) – Cross-platform process and system utilities
 - [Ruff](https://github.com/astral-sh/ruff) – Python linter for fast and modern code analysis
 - [Pre-commit](https://pre-commit.com/) – Framework for managing Git hooks

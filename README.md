@@ -136,7 +136,7 @@ Tested on:
 
 This project is licensed under the [GPL-2.0 License](LICENSE).
 
-> This project is inspired by [arescue](https://github.com/jnissin/arescue) by Joonas Nissinen, originally licensed under GPL-2.0.  
+> This project is inspired by [arescue](https://github.com/jnissin/arescue) by Joonas Nissinen, originally licensed under GPL-2.0.
 > All original credit goes to the author.
 
 ---

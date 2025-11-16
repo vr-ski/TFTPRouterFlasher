@@ -44,12 +44,6 @@ repos:
         args: ["-c", "pyproject.toml"]
         files: ^src/
 
-  - repo: https://github.com/Lucas-C/pre-commit-hooks-safety
-    rev: v1.4.2
-    hooks:
-      - id: python-safety-dependencies-check
-        args: []  # Ignore specific CVEs if needed
-
   - repo: https://github.com/gitleaks/gitleaks
     rev: v8.29.0
     hooks:
