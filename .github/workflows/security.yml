@@ -1,0 +1,70 @@
+name: Security Scan
+
+on:
+  schedule:
+    # Run daily at 6 AM UTC
+    - cron: '0 6 * * *'
+  workflow_dispatch:  # Allow manual triggers
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  safety-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - uses: ./.github/actions/setup-python
+        with:
+          python-version: "3.11"
+          requirements: "requirements-security.txt"
+
+      - name: Run Safety check
+        run: safety check --full-report
+
+  bandit-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - uses: ./.github/actions/setup-python-security
+        with:
+          python-version: "3.11"
+          requirements: "requirements-security.txt"
+
+      - name: Run Bandit
+        run: bandit -r src/ -f json -o bandit-report.json || true; bandit -r src/ -f txt
+
+  codeql-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v4
+        with:
+          languages: python
+
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v4
+
+      - name: Run CodeQL Analysis
+        uses: github/codeql-action/analyze@v4
+        with:
+          languages: python
+
+  secret-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Run Gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
