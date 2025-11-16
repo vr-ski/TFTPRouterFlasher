@@ -42,3 +42,13 @@ package-dir = { "" = "src" }
 [tool.setuptools.packages.find]
 where = ["src"]
 
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-v --cov=tftp_router_flasher --cov-report=xml --cov-report=html"
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+
+[tool.coverage.run]
+source = ["tftp_router_flasher"]
+omit = ["*/test_*", "*/__pycache__/*"]
