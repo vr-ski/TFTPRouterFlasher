@@ -38,7 +38,9 @@ def validate_interface(interface: str) -> bool:
 
 def get_ip_info(interface: str) -> tuple[str, str]:
     result = subprocess.run(
-        ["ip", "-4", "addr", "show", interface], capture_output=True, text=True
+        ["ip", "-4", "addr", "show", interface],
+        capture_output=True,
+        text=True,
     )
     for line in result.stdout.splitlines():
         if "inet " in line:
@@ -57,7 +59,11 @@ def get_default_gateway() -> str:
 
 
 def print_connection_info(
-    hostname: str, ipaddr: str, netmask: str, gateway: str, logger: logging.Logger
+    hostname: str,
+    ipaddr: str,
+    netmask: str,
+    gateway: str,
+    logger: logging.Logger,
 ) -> None:
     logger.info(f"Hostname: {hostname}")
     logger.info(f"IP Address: {ipaddr}")
@@ -66,7 +72,11 @@ def print_connection_info(
 
 
 def ping_host(
-    ip: str, no_ping: bool, logger: logging.Logger, retries: int = 3, delay: int = 1
+    ip: str,
+    no_ping: bool,
+    logger: logging.Logger,
+    retries: int = 3,
+    delay: int = 1,
 ) -> bool:
     if no_ping:
         return True
@@ -81,7 +91,11 @@ def ping_host(
 
 
 def configure_interface(
-    interface: str, ip: str, netmask: str, gateway: str, logger: logging.Logger
+    interface: str,
+    ip: str,
+    netmask: str,
+    gateway: str,
+    logger: logging.Logger,
 ) -> None:
     logger.debug(f"Configuring interface {interface} with IP {ip}")
     subprocess.run(["ip", "addr", "flush", "dev", interface])
@@ -91,7 +105,11 @@ def configure_interface(
 
 
 def try_default_ip_range(
-    interface: str, firmware: str, timeout: int, no_ping: bool, logger: logging.Logger
+    interface: str,
+    firmware: str,
+    timeout: int,
+    no_ping: bool,
+    logger: logging.Logger,
 ) -> bool:
     for i in range(2, 26):
         test_ip = f"192.168.1.{i}"
@@ -103,7 +121,10 @@ def try_default_ip_range(
 
 
 def upload_binary_using_tftp(
-    hostname: str, firmware: str, timeout: int, logger: logging.Logger
+    hostname: str,
+    firmware: str,
+    timeout: int,
+    logger: logging.Logger,
 ) -> bool:
     logger.info(f"Uploading firmware to {hostname}")
     try:
@@ -152,7 +173,10 @@ def main() -> None:
     parser.add_argument("--firmware", required=True, help="Path to the firmware file")
     parser.add_argument("--hostname", default="192.168.1.1", help="Router IP address")
     parser.add_argument(
-        "--timeout", type=int, default=120, help="TFTP timeout in seconds"
+        "--timeout",
+        type=int,
+        default=120,
+        help="TFTP timeout in seconds",
     )
     parser.add_argument("--interface", default="en0", help="Network interface to use")
     parser.add_argument(
@@ -173,7 +197,12 @@ def main() -> None:
         sys.exit(1)
 
     if not upload_firmware(
-        args.hostname, args.interface, args.firmware, args.timeout, args.no_ping, logger
+        args.hostname,
+        args.interface,
+        args.firmware,
+        args.timeout,
+        args.no_ping,
+        logger,
     ):
         logger.error("Firmware upload failed")
         sys.exit(1)

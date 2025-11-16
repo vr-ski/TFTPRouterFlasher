@@ -1,12 +1,38 @@
 line-length = 88
 target-version = "py311"
 
+# Exclude test files from linting
+exclude = [
+    "tests/",
+    "build/",
+    "dist/",
+    "*.egg-info/",
+    "**/__pycache__/",
+]
+
 [lint]
-select = ["E", "F", "I", "B", "ANN"]  # Example: pycodestyle, pyflakes, isort, bugbear, flake8-annotations rules
-ignore = ["E501"]              # Example: ignore line length errors
+select = [
+    "E",   # pycodestyle errors
+    "F",   # pyflakes
+    "I",   # isort (import sorting)
+    "B",   # flake8-bugbear
+    "ANN", # flake8-annotations (type hints)
+    "UP",  # pyupgrade
+    "C4",  # flake8-comprehensions
+    "T10", # flake8-debugger
+    "EM",  # flake8-errmsg
+    "W",   # pycodestyle warnings
+    "Q",   # flake8-quotes
+    "COM", # flake8-commas
+    "RUF", # Ruff-specific rules
+]
+ignore = [
+    "E501",  # ignore line length errors (handled by formatter)
+    "COM812", # missing-trailing-comma
+]
 
 [format]
-quote-style = "double"          # Use double quotes for strings
-indent-style = "space"          # Use spaces instead of tabs
-line-ending = "auto"            # Match platform default
-
+quote-style = "double"    # Use double quotes for strings
+indent-style = "space"    # Use spaces instead of tabs
+line-ending = "auto"      # Match platform default
+skip-magic-trailing-comma = false  # Keep trailing commas
