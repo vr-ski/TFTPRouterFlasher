@@ -35,7 +35,7 @@ jobs:
           requirements: ".[security]"
 
       - name: Run Bandit
-        run: bandit -r src/ -f json -o bandit-report.json || true; bandit -r src/ -f txt
+        run: bandit -r src/ -c pyproject.toml -f txt
 
   codeql-scan:
     runs-on: ubuntu-latest
