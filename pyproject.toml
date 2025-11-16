@@ -115,7 +115,7 @@ ignore_missing_imports = true  # Added this line
 exclude = [
     "build/",
     "dist/",
-    "*.egg-info/",
+    ".*\\.egg-info",
 ]
 
 # Ignore all errors in test files
