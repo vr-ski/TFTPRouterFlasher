@@ -112,6 +112,11 @@ warn_unused_configs = true
 disallow_untyped_defs = true
 show_error_codes = true
 ignore_missing_imports = true  # Added this line
+exclude = [
+    "build/",
+    "dist/",
+    "*.egg-info/",
+]
 
 # Ignore all errors in test files
 [[tool.mypy.overrides]]
