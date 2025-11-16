@@ -79,12 +79,12 @@ pytest tests/
 
 ## 📄 License and Attribution
 
-By contributing, you agree that your code will be released under the GPL-2.0 License.  
+By contributing, you agree that your code will be released under the GPL-2.0 License.
 This project is inspired by [arescue](https://github.com/jnissin/arescue) by Joonas Nissinen, originally licensed under GPL-2.0.
 
 ---
 
 ## 🙌 Thank You
 
-Your contributions help keep this project alive and useful.  
+Your contributions help keep this project alive and useful.
 If you’ve tested this tool with a new router model or platform, please share your experience!

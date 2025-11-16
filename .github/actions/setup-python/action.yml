@@ -5,6 +5,10 @@ inputs:
     description: 'Python version'
     required: false
     default: '3.11'
+  requirements:
+    description: 'Requirements section'
+    required: false
+    default: '.[dev]'
 
 runs:
   using: 'composite'
@@ -20,4 +24,4 @@ runs:
 
     - name: Install dependencies
       shell: bash
-      run: pip install -r requirements-dev.txt
+      run: pip install ${{ inputs.requirements }}
