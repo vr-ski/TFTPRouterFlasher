@@ -39,6 +39,11 @@ jobs:
 
   codeql-scan:
     runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+      actions: read
+      contents: read
+      packages: read
     steps:
       - name: Checkout code
         uses: actions/checkout@v5
