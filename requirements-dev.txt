@@ -1,9 +1,10 @@
 -r requirements.txt  # Include all runtime dependencies
 
 # Dev-only tools
-ruff
-mypy
-pre-commit
+ruff>=0.10.0
+mypy>=1.14.0
+pre-commit>=4.0.0
+build>=1.0.0
 
 # Test dependencies
 pytest>=8.0.0
