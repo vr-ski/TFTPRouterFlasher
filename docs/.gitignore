@@ -1,0 +1,3 @@
+# Ignore symlinked files - they are generated during CI/CD
+/index.md
+/contributing.md
