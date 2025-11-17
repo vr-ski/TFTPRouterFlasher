@@ -13,6 +13,15 @@ import tftpy
 
 
 def setup_logger(debug_enabled: bool) -> logging.Logger:
+    """
+    Configure and set up a logger with both console and file handlers.
+
+    Args:
+        debug_enabled (bool): If True, sets console log level to DEBUG, otherwise INFO.
+
+    Returns:
+        logging.Logger: Configured logger instance with console and file handlers.
+    """
     logger = logging.getLogger("TFTPRouterFlasher")
     logger.setLevel(logging.DEBUG if debug_enabled else logging.INFO)
 
@@ -33,10 +42,28 @@ def setup_logger(debug_enabled: bool) -> logging.Logger:
 
 
 def validate_interface(interface: str) -> bool:
+    """
+    Check if the specified network interface exists on the system.
+
+    Args:
+        interface (str): Name of the network interface to validate.
+
+    Returns:
+        bool: True if interface exists, False otherwise.
+    """
     return interface in psutil.net_if_addrs()
 
 
 def get_ip_info(interface: str) -> tuple[str, str]:
+    """
+    Retrieve IP address and netmask for the specified network interface.
+
+    Args:
+        interface (str): Network interface name to query.
+
+    Returns:
+        tuple[str, str]: (IP address, netmask) or empty strings if not found.
+    """
     result = subprocess.run(
         ["ip", "-4", "addr", "show", interface],
         capture_output=True,
@@ -51,6 +78,12 @@ def get_ip_info(interface: str) -> tuple[str, str]:
 
 
 def get_default_gateway() -> str:
+    """
+    Get the system's default gateway IP address.
+
+    Returns:
+        str: Default gateway IP address, or empty string if not found.
+    """
     result = subprocess.run(["ip", "route"], capture_output=True, text=True)
     for line in result.stdout.splitlines():
         if line.startswith("default"):
@@ -65,6 +98,16 @@ def print_connection_info(
     gateway: str,
     logger: logging.Logger,
 ) -> None:
+    """
+    Log network connection information for debugging and user visibility.
+
+    Args:
+        hostname (str): Target router hostname/IP.
+        ipaddr (str): Local IP address.
+        netmask (str): Local network mask.
+        gateway (str): Default gateway.
+        logger (logging.Logger): Logger instance for output.
+    """
     logger.info(f"Hostname: {hostname}")
     logger.info(f"IP Address: {ipaddr}")
     logger.info(f"Netmask: {netmask}")
@@ -78,6 +121,19 @@ def ping_host(
     retries: int = 3,
     delay: int = 1,
 ) -> bool:
+    """
+    Ping a host to check network connectivity with retry logic.
+
+    Args:
+        ip (str): IP address to ping.
+        no_ping (bool): If True, skip ping and return True (for bypass mode).
+        logger (logging.Logger): Logger instance for output.
+        retries (int): Number of ping attempts before giving up.
+        delay (int): Seconds to wait between retries.
+
+    Returns:
+        bool: True if ping successful or no_ping is True, False otherwise.
+    """
     if no_ping:
         return True
 
@@ -97,6 +153,16 @@ def configure_interface(
     gateway: str,
     logger: logging.Logger,
 ) -> None:
+    """
+    Configure network interface with specified IP, netmask, and gateway.
+
+    Args:
+        interface (str): Network interface to configure.
+        ip (str): IP address to assign.
+        netmask (str): Network mask to apply.
+        gateway (str): Default gateway to set.
+        logger (logging.Logger): Logger instance for output.
+    """
     logger.debug(f"Configuring interface {interface} with IP {ip}")
     subprocess.run(["ip", "addr", "flush", "dev", interface])
     subprocess.run(["ip", "addr", "add", f"{ip}/{netmask}", "dev", interface])
@@ -111,6 +177,22 @@ def try_default_ip_range(
     no_ping: bool,
     logger: logging.Logger,
 ) -> bool:
+    """
+    Attempt firmware upload using common default IP ranges for routers.
+
+    This method tries IPs from 192.168.1.2 to 192.168.1.25, configuring
+    the local interface and attempting TFTP upload for each.
+
+    Args:
+        interface (str): Network interface to use.
+        firmware (str): Path to firmware file.
+        timeout (int): TFTP timeout in seconds.
+        no_ping (bool): Whether to skip ping checks.
+        logger (logging.Logger): Logger instance for output.
+
+    Returns:
+        bool: True if upload successful, False if all attempts fail.
+    """
     for i in range(2, 26):
         test_ip = f"192.168.1.{i}"
         configure_interface(interface, test_ip, "24", "192.168.1.1", logger)
@@ -126,6 +208,18 @@ def upload_binary_using_tftp(
     timeout: int,
     logger: logging.Logger,
 ) -> bool:
+    """
+    Upload firmware file to router using TFTP protocol.
+
+    Args:
+        hostname (str): Router IP address/hostname.
+        firmware (str): Path to firmware file to upload.
+        timeout (int): TFTP operation timeout in seconds.
+        logger (logging.Logger): Logger instance for output.
+
+    Returns:
+        bool: True if upload successful, False on error.
+    """
     logger.info(f"Uploading firmware to {hostname}")
     try:
         client = tftpy.TftpClient(hostname, 69)
@@ -138,6 +232,16 @@ def upload_binary_using_tftp(
 
 
 def validate_firmware_path(firmware: str, logger: logging.Logger) -> bool:
+    """
+    Validate that the firmware file exists and is accessible.
+
+    Args:
+        firmware (str): Path to firmware file.
+        logger (logging.Logger): Logger instance for error output.
+
+    Returns:
+        bool: True if firmware file exists, False otherwise.
+    """
     if not os.path.isfile(firmware):
         logger.error(f"Invalid firmware path: {firmware}")
         return False
@@ -152,6 +256,23 @@ def upload_firmware(
     no_ping: bool,
     logger: logging.Logger,
 ) -> bool:
+    """
+    Main firmware upload orchestration function.
+
+    Attempts upload to specified hostname, falls back to default IP range
+    if initial attempt fails and user approves.
+
+    Args:
+        hostname (str): Target router IP address.
+        interface (str): Network interface to use.
+        firmware (str): Path to firmware file.
+        timeout (int): TFTP timeout in seconds.
+        no_ping (bool): Whether to skip ping verification.
+        logger (logging.Logger): Logger instance for output.
+
+    Returns:
+        bool: True if upload successful, False otherwise.
+    """
     ipaddr, netmask = get_ip_info(interface)
     gateway = get_default_gateway()
     print_connection_info(hostname, ipaddr, netmask, gateway, logger)
@@ -169,6 +290,12 @@ def upload_firmware(
 
 
 def main() -> None:
+    """
+    Main entry point for TFTP Router Flasher application.
+
+    Handles command line arguments, validates inputs, and orchestrates
+    the firmware upload process.
+    """
     parser = argparse.ArgumentParser(description="ASUS RT firmware rescue tool")
     parser.add_argument("--firmware", required=True, help="Path to the firmware file")
     parser.add_argument("--hostname", default="192.168.1.1", help="Router IP address")
