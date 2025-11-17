@@ -1,6 +1,7 @@
 name: Deploy Documentation
 
 on:
+  workflow_dispatch:
   push:
     branches: [ main ]
     paths:
@@ -12,6 +13,8 @@ on:
 
 permissions:
   contents: write
+  pages: write
+  id-token: write
 
 jobs:
   deploy:
