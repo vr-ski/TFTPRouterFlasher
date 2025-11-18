@@ -49,7 +49,7 @@ runs:
     - name: Upload to PyPI
       shell: bash
       run: |
-        twine upload --repository-url ${{ inputs.pypi-upload-url }} dist/*
+        twine upload --repository-url ${{ inputs.pypi-upload-url }} dist/* --verbose
       env:
         TWINE_USERNAME: __token__
         TWINE_PASSWORD: ${{ inputs.pypi-token }}
