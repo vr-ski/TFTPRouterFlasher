@@ -2,9 +2,9 @@ name: CD - Dev Publishing
 
 on:
   push:
-    branches: [ feature/add_cd_workflow ]
+    branches: [feature/add_cd_workflow]
   workflow_run:
-    workflows: [Lint and Type Check, Security Scan ]
+    workflows: [Lint and Type Check, Security Scan]
     types: [completed]
     branches: [main]
     tags-ignore: ['**']
@@ -12,7 +12,6 @@ on:
 
 jobs:
   publish-dev:
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     environment: testpypi
     steps:
