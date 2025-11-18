@@ -15,6 +15,9 @@ jobs:
     runs-on: ubuntu-latest
     environment: testpypi
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
       - name: Calculate dev version
         id: version
         shell: bash
@@ -40,6 +43,7 @@ jobs:
 
           echo "Dev version: $DEV_VERSION"
           echo "version=$DEV_VERSION" >> $GITHUB_OUTPUT
+
       - name: Build and publish to TestPyPI
         uses: ./.github/actions/build-and-publish
         with:
