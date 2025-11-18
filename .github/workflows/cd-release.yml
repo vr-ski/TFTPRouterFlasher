@@ -1,0 +1,28 @@
+name: CD - Production Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  publish-release:
+    runs-on: ubuntu-latest
+    environment: pypi
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Extract version from tag
+        id: version
+        run: |
+          VERSION="${GITHUB_REF#refs/tags/v}"
+          echo "version=$VERSION"
+
+      - name: Build and publish to PyPI
+        uses: ./.github/actions/build-and-publish
+        with:
+          pypi-upload-url: 'https://upload.pypi.org/legacy/'
+          pypi-install-url: 'https://pypi.org/simple/'
+          pypi-token: ${{ secrets.PYPI_API_TOKEN }}

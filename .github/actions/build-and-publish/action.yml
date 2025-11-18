@@ -1,0 +1,61 @@
+name: 'Build and Publish Python Package'
+description: 'Builds and publishes Python package to specified PyPI repository'
+
+inputs:
+  pypi-upload-url:
+    description: 'Upload repository URL'
+    required: true
+    default: 'https://upload.pypi.org/legacy/'
+  pypi-install-url:
+    description: 'Install repository URL'
+    required: true
+    default: 'https://pypi.org/simple/'
+  version-override:
+    description: 'Override version (for dev builds)'
+    required: false
+    default: ''
+  pypi-token:
+    description: 'PyPI API token'
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Checkout
+      uses: actions/checkout@v5
+      with:
+        fetch-depth: 0  # Full history for setuptools-scm
+
+    - uses: ./.github/actions/setup-python
+      with:
+        python-version: '3.11'
+        requirements: '.[build]'
+
+    - name: Configure version for dev builds
+      if: inputs.version-override != ''
+      shell: bash
+      run: |
+        echo "Setting version override: ${{ inputs.version-override }}"
+        echo "SETUPTOOLS_SCM_PRETEND_VERSION=${{ inputs.version-override }}" >> $GITHUB_ENV
+
+    - name: Build package
+      shell: bash
+      run: python -m build
+
+    - name: Verify package
+      shell: bash
+      run: twine check dist/*
+
+    - name: Upload to PyPI
+      shell: bash
+      run: |
+        twine upload --repository-url ${{ inputs.pypi-upload-url }} dist/* --verbose
+      env:
+        TWINE_USERNAME: __token__
+        TWINE_PASSWORD: ${{ inputs.pypi-token }}
+
+    - name: Verify installation
+      shell: bash
+      run: |
+        PACKAGE_NAME=$(python -c "import tomli; print(tomli.load(open('pyproject.toml', 'rb'))['project']['name'])")
+        pip install --index-url "${{ inputs.pypi-install-url }}" "$PACKAGE_NAME"
