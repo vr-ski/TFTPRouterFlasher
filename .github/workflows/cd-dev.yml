@@ -1,8 +1,6 @@
 name: CD - Dev Publishing
 
 on:
-  push:
-    branches: [feature/add_cd_workflow]
   workflow_run:
     workflows: [Lint and Type Check, Security Scan]
     types: [completed]
