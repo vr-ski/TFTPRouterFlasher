@@ -31,37 +31,12 @@ runs:
         python-version: '3.11'
         requirements: '.[build]'
 
-    - name: Debug - Before version override
-      shell: bash
-      run: |
-        echo "Version override input: ${{ inputs.version-override }}"
-        echo "SETUPTOOLS_SCM_PRETEND_VERSION before: ${SETUPTOOLS_SCM_PRETEND_VERSION:-NOT SET}"
-
     - name: Configure version for dev builds
       if: inputs.version-override != ''
       shell: bash
       run: |
         echo "Setting version override: ${{ inputs.version-override }}"
         echo "SETUPTOOLS_SCM_PRETEND_VERSION=${{ inputs.version-override }}" >> $GITHUB_ENV
-
-    - name: Debug - After version override
-      shell: bash
-      run: |
-        echo "SETUPTOOLS_SCM_PRETEND_VERSION after: ${SETUPTOOLS_SCM_PRETEND_VERSION:-NOT SET}"
-        echo "All environment variables:"
-        env | grep -i version || echo "No version-related env vars"
-
-    - name: Debug - Check setuptools-scm version detection
-      shell: bash
-      run: |
-        python -c "
-        try:
-            from setuptools_scm import get_version
-            version = get_version()
-            print(f'setuptools-scm detected version: {version}')
-        except Exception as e:
-            print(f'Error getting version: {e}')
-        "
 
     - name: Build package
       shell: bash

@@ -6,7 +6,8 @@ build-backend = "setuptools.build_meta"
 write_to = "src/tftp_router_flasher/_version.py"  # Create version file
 version_scheme = "no-guess-dev"                   # Increment patch for dev
 local_scheme = "no-local-version"                 # No local git state
-fallback_version = "0.0.0.dev0"
+fallback_version = "0.0.0.dev0"                   # When no tags exist
+tag_regex = "^v(?P<version>.*)$"                  # PEP 440 compliant
 
 [project]
 name = "tftp-router-flasher"
