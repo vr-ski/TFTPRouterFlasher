@@ -10,7 +10,7 @@ readme = "README.md"
 requires-python = ">=3.8"
 license = { text = "GPL-2.0" }
 authors = [
-  { name = "Modernized by vr-ski" }
+    {name = "vr-ski", email = "166657596+vr-ski@users.noreply.github.com"}
 ]
 dependencies = [
   "tftpy==0.8.6",
@@ -53,9 +53,10 @@ security = [
 
 
 [project.urls]
-Homepage = "https://github.com/vr-ski/TFTPRouterFlasher"
+Homepage = "https://vr-ski.github.io/TFTPRouterFlasher/"
 Source = "https://github.com/vr-ski/TFTPRouterFlasher"
 Issues = "https://github.com/vr-ski/TFTPRouterFlasher/issues"
+"CI/CD" = "https://github.com/vr-ski/TFTPRouterFlasher/actions"
 
 [project.scripts]
 tftp-router-flasher = "tftp_router_flasher.main:main"
