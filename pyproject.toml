@@ -34,7 +34,6 @@ classifiers = [
   "Environment :: Console",
   "Topic :: System :: Networking",
   "Topic :: System :: Boot",
-  "Topic :: System :: Recovery",
   "Topic :: Utilities",
   "Intended Audience :: System Administrators",
   "Intended Audience :: Developers",
