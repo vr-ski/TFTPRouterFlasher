@@ -1,0 +1,50 @@
+name: CD - Dev Publishing
+
+on:
+  push:
+    branches: [ feature/add_cd_workflow ]
+  workflow_run:
+    workflows: [Lint and Type Check, Security Scan ]
+    types: [completed]
+    branches: [main]
+    tags-ignore: ['**']
+  workflow_dispatch:
+
+jobs:
+  publish-dev:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    environment: testpypi
+    steps:
+      - name: Calculate dev version
+        id: version
+        shell: bash
+        run: |
+          # Get latest tag or default to 0.0.0
+          LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "0.0.0")
+          echo "Latest tag: $LATEST_TAG"
+
+          # Remove 'v' prefix if present
+          LATEST_TAG=${LATEST_TAG#v}
+
+          # Parse version components
+          IFS='.' read -r MAJOR MINOR PATCH <<< "$LATEST_TAG"
+
+          # If no tags found, default to 0.0.0
+          if [ -z "$MAJOR" ]; then
+            MAJOR=0
+            MINOR=0
+            PATCH=0
+          fi
+
+          DEV_VERSION="${MAJOR}.${MINOR}.${PATCH}+dev${{ github.run_number }}"
+
+          echo "Dev version: $DEV_VERSION"
+          echo "version=$DEV_VERSION" >> $GITHUB_OUTPUT
+      - name: Build and publish to TestPyPI
+        uses: ./.github/actions/build-and-publish
+        with:
+          pypi-upload-url: 'https://test.pypi.org/legacy/'
+          pypi-install-url: 'https://test.pypi.org/simple/'
+          version-override: ${{ steps.version.outputs.version }}
+          pypi-token: ${{ secrets.TEST_PYPI_API_TOKEN }}
