@@ -39,7 +39,7 @@ jobs:
             PATCH=0
           fi
 
-          DEV_VERSION="${MAJOR}.${MINOR}.${PATCH}+dev${{ github.run_number }}"
+          DEV_VERSION="${MAJOR}.${MINOR}.${PATCH}.dev${{ github.run_number }}"
 
           echo "Dev version: $DEV_VERSION"
           echo "version=$DEV_VERSION" >> $GITHUB_OUTPUT
