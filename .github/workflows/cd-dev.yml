@@ -1,11 +1,8 @@
 name: CD - Dev Publishing
 
 on:
-  workflow_run:
-    workflows: [Lint and Type Check, Security Scan]
-    types: [completed]
-    branches: [main]
-    tags-ignore: ['**']
+  push:
+    branches: [ main ]
   workflow_dispatch:
 
 jobs:
