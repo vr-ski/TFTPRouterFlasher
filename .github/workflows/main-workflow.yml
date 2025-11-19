@@ -39,6 +39,7 @@ jobs:
     name: CD Dev Publishing
     needs: [ci, security, docs]
     if: |
+      !cancelled() &&
       needs.ci.outputs.overall-success == 'true' &&
       needs.security.outputs.overall-success == 'true' &&
       (needs.docs.result == 'success' || needs.docs.result == 'skipped') &&
@@ -52,6 +53,7 @@ jobs:
     needs: [ci, security, docs]
     steps:
       - name: Debug outputs
+        if: ${{ always() }}
         run: |
           echo "CI result: ${{ needs.ci.result }}"
           echo "CI overall-success: ${{ needs.ci.outputs.overall-success }}"
