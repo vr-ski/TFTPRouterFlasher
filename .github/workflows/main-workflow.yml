@@ -9,9 +9,11 @@ on:
 
 jobs:
   ci:
+    name: CI lint, type, test, build
     uses: ./.github/workflows/reusable-ci.yml
 
   security:
+    name: Security scans
     permissions:
       security-events: write
       actions: read
@@ -20,6 +22,7 @@ jobs:
     uses: ./.github/workflows/reusable-security.yml
 
   docs:
+    name: Deploy Documentation
     permissions:
       contents: write
       pages: write
@@ -33,12 +36,26 @@ jobs:
     uses: ./.github/workflows/reusable-docs.yml
 
   cd-dev:
+    name: CD Dev Publishing
     needs: [ci, security, docs]
     if: |
       needs.ci.outputs.overall-success == 'true' &&
       needs.security.outputs.overall-success == 'true' &&
       (needs.docs.result == 'success' || needs.docs.result == 'skipped') &&
       (contains(github.event.head_commit.modified, 'src/') ||
-       contains(github.event.head_commit.modified, 'pyproject.toml'))
+      contains(github.event.head_commit.modified, 'pyproject.toml'))
     uses: ./.github/workflows/reusable-cd-dev.yml
     secrets: inherit
+
+  debug-deps:
+    runs-on: ubuntu-latest
+    needs: [ci, security, docs]
+    steps:
+      - name: Debug outputs
+        run: |
+          echo "CI result: ${{ needs.ci.result }}"
+          echo "CI overall-success: ${{ needs.ci.outputs.overall-success }}"
+          echo "Security result: ${{ needs.security.result }}"
+          echo "Security overall-success: ${{ needs.security.outputs.overall-success }}"
+          echo "Docs result: ${{ needs.docs.result }}"
+          echo "Modified files: ${{ join(github.event.head_commit.modified, ', ') }}"
