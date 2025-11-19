@@ -36,6 +36,7 @@ jobs:
 
   cd-dev:
     name: CD Dev Publishing
-    needs: [ci, security]
+    needs: [ci, security, docs]
+    if: ${{ !cancelled() }}
     uses: ./.github/workflows/reusable-cd-dev.yml
     secrets: inherit
