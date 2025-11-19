@@ -53,7 +53,6 @@ jobs:
     needs: [ci, security, docs]
     steps:
       - name: Debug outputs
-        if: always()
         run: |
           echo "CI result: ${{ needs.ci.result }}"
           echo "CI overall-success: ${{ needs.ci.outputs.overall-success }}"
