@@ -1,9 +1,7 @@
 name: CD - Dev Publishing
 
 on:
-  push:
-    branches: [ main ]
-  workflow_dispatch:
+  workflow_call:
 
 jobs:
   publish-dev:

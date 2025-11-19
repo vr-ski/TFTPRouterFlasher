@@ -1,0 +1,35 @@
+name: Main Workflow
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  ci:
+    uses: ./.github/workflows/reusable-ci.yml
+
+  security:
+    uses: ./.github/workflows/reusable-security.yml
+
+  docs:
+    # Only run docs if documentation files change
+    if: |
+      contains(github.event.head_commit.modified, 'docs/') ||
+      contains(github.event.head_commit.modified, 'README.md') ||
+      contains(github.event.head_commit.modified, 'CONTRIBUTING.md') ||
+      contains(github.event.head_commit.modified, 'mkdocs.yml')
+    uses: ./.github/workflows/reusable-docs.yml
+
+  cd-dev:
+    needs: [ci, security, docs]
+    if: |
+      needs.ci.outputs.overall-success == 'true' &&
+      needs.security.outputs.overall-success == 'true' &&
+      needs.docs.outputs.success == 'true' &&
+      (contains(github.event.head_commit.modified, 'src/') ||
+       contains(github.event.head_commit.modified, 'pyproject.toml'))
+    uses: ./.github/workflows/reusable-cd-dev.yml
+    secrets: inherit

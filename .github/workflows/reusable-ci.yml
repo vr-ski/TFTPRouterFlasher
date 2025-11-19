@@ -1,15 +1,11 @@
-name: Lint and Type Check
+name: Lint, Checks, Automated Tests, Build Test
 
 on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
-
-# Define reusable steps as anchors
-defaults:
-  run:
-    shell: bash
+  workflow_call:
+    outputs:
+      overall-success:
+        description: "CI all checks passed"
+        value:  ${{ jobs.aggregate-results.outputs.overall-success }}
 
 jobs:
   ruff-check:
@@ -90,3 +86,22 @@ jobs:
 
       - name: Installation dry run
         run: pip install dist/*.whl
+
+  aggregate-results:
+    needs: [ruff-check, ruff-format, mypy, unit-tests, build-package ]
+    runs-on: ubuntu-latest
+    outputs:
+      overall-success: ${{ steps.aggregate.outputs.overall-success }}
+    steps:
+      - name: Check if all jobs passed
+        id: aggregate
+        run: |
+          if [[ "${{ needs.ruff-check.result }}" == "success" && \
+                "${{ needs.ruff-format.result }}" == "success" && \
+                "${{ needs.mypy.result }}" == "success" && \
+                "${{ needs.unit-tests.result }}" == "success" && \
+                "${{ needs.build-package.result }}" == "success" ]]; then
+            echo "overall-success=true" >> $GITHUB_OUTPUT
+          else
+            echo "overall-success=false" >> $GITHUB_OUTPUT
+          fi
