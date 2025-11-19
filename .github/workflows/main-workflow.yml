@@ -37,10 +37,5 @@ jobs:
   cd-dev:
     name: CD Dev Publishing
     needs: [ci, security]
-    if: |
-      needs.ci.outputs.overall-success == 'true' &&
-      needs.security.outputs.overall-success == 'true' &&
-      (contains(github.event.head_commit.modified, 'src/') ||
-      contains(github.event.head_commit.modified, 'pyproject.toml'))
     uses: ./.github/workflows/reusable-cd-dev.yml
     secrets: inherit
