@@ -12,9 +12,18 @@ jobs:
     uses: ./.github/workflows/reusable-ci.yml
 
   security:
+    permissions:
+      security-events: write
+      actions: read
+      contents: read
+      packages: read
     uses: ./.github/workflows/reusable-security.yml
 
   docs:
+    permissions:
+      contents: write
+      pages: write
+      id-token: write
     # Only run docs if documentation files change
     if: |
       contains(github.event.head_commit.modified, 'docs/') ||

@@ -6,10 +6,11 @@ on:
     - cron: '0 6 * * *'
   workflow_dispatch:  # Allow manual triggers
 
-permissions:
-  actions: read
-  security-events: write
-
 jobs:
   security:
+    permissions:
+      security-events: write
+      actions: read
+      contents: read
+      packages: read
     uses: ./.github/workflows/reusable-security.yml
