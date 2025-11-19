@@ -1,14 +1,11 @@
 name: Security Scan
 
 on:
-  schedule:
-    # Run daily at 6 AM UTC
-    - cron: '0 6 * * *'
-  workflow_dispatch:  # Allow manual triggers
-  pull_request:
-    branches: [ main ]
-  push:
-    branches: [ main ]
+  workflow_call:
+    outputs:
+      overall-success:
+        description: "Security all checks passed"
+        value: ${{ jobs.aggregate-results.outputs.overall-success }}
 
 jobs:
   safety-scan:
@@ -75,3 +72,21 @@ jobs:
         uses: gitleaks/gitleaks-action@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  aggregate-results:
+    needs: [safety-scan, bandit-scan, codeql-scan, secret-scan]
+    runs-on: ubuntu-latest
+    outputs:
+      overall-success: ${{ steps.aggregate.outputs.overall-success }}
+    steps:
+      - name: Check if all jobs passed
+        id: aggregate
+        run: |
+          if [[ "${{ needs.safety-scan.result }}" == "success" && \
+                "${{ needs.bandit-scan.result }}" == "success" && \
+                "${{ needs.codeql-scan.result }}" == "success" && \
+                "${{ needs.secret-scan.result }}" == "success" ]]; then
+            echo "overall-success=true" >> $GITHUB_OUTPUT
+          else
+            echo "overall-success=false" >> $GITHUB_OUTPUT
+          fi
