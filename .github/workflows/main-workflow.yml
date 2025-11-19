@@ -37,7 +37,7 @@ jobs:
     if: |
       needs.ci.outputs.overall-success == 'true' &&
       needs.security.outputs.overall-success == 'true' &&
-      needs.docs.outputs.success == 'true' &&
+      (needs.docs.result == 'success' || needs.docs.result == 'skipped') &&
       (contains(github.event.head_commit.modified, 'src/') ||
        contains(github.event.head_commit.modified, 'pyproject.toml'))
     uses: ./.github/workflows/reusable-cd-dev.yml
