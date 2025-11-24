@@ -35,7 +35,7 @@ jobs:
             -d ":action=remove" \
             -d "name=${{ env.PACKAGE_NAME }}" \
             -d "version=${{ env.VERSION }}" \
-            "${env.TEST_PYPI_UPLOAD_URL}" || echo "Package didn't exist or delete failed - continuing"
+            "${{ env.TEST_PYPI_UPLOAD_URL }}" || echo "Package didn't exist or delete failed - continuing"
 
       - name: Calculate dev version
         id: version
