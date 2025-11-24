@@ -18,11 +18,10 @@ jobs:
       - name: Extract package info
         id: package-info
         run: |
-          PACKAGE_NAME=$(python -c "import tomli; print(tomli.load(open('pyproject.toml', 'rb'))['project']['name'])")
-          VERSION=$(python -c "import tomli; print(tomli.load(open('pyproject.toml', 'rb'))['project']['version'])")
+          PACKAGE_NAME=$(python -c "import tomllib; print(tomllib.load(open('pyproject.toml', 'rb'))['project']['name'])")
+          VERSION=$(python -c "import tomllib; print(tomllib.load(open('pyproject.toml', 'rb'))['project']['version'])")
           echo "PACKAGE_NAME=$PACKAGE_NAME" >> $GITHUB_ENV
           echo "VERSION=$VERSION" >> $GITHUB_ENV
-
       - name: Delete existing package from Test PyPI (if exists)
         run: |
           # This will fail gracefully if the package doesn't exist
