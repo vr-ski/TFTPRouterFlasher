@@ -3,6 +3,10 @@ name: CD - Dev Publishing
 on:
   workflow_call:
 
+env:
+  TEST_PYPI_UPLOAD_URL: "https://test.pypi.org/legacy/"
+  TEST_PYPI_INSTALL_URL: "https://test.pypi.org/simple/"
+
 jobs:
   publish-dev:
     runs-on: ubuntu-latest
@@ -10,6 +14,24 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v5
+
+      - name: Extract package info
+        id: package-info
+        run: |
+          PACKAGE_NAME=$(python -c "import tomli; print(tomli.load(open('pyproject.toml', 'rb'))['project']['name'])")
+          VERSION=$(python -c "import tomli; print(tomli.load(open('pyproject.toml', 'rb'))['project']['version'])")
+          echo "PACKAGE_NAME=$PACKAGE_NAME" >> $GITHUB_ENV
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+
+      - name: Delete existing package from Test PyPI (if exists)
+        run: |
+          # This will fail gracefully if the package doesn't exist
+          curl -f -X DELETE \
+            -H "Authorization: token ${{ secrets.TEST_PYPI_API_TOKEN }}" \
+            -d ":action=remove" \
+            -d "name=${{ env.PACKAGE_NAME }}" \
+            -d "version=${{ env.VERSION }}" \
+            "${TEST_PYPI_UPLOAD_URL}" || echo "Package didn't exist or delete failed - continuing"
 
       - name: Calculate dev version
         id: version
@@ -40,7 +62,7 @@ jobs:
       - name: Build and publish to TestPyPI
         uses: ./.github/actions/build-and-publish
         with:
-          pypi-upload-url: 'https://test.pypi.org/legacy/'
-          pypi-install-url: 'https://test.pypi.org/simple/'
+          pypi-upload-url: ${{ TEST_PYPI_UPLOAD_URL }}
+          pypi-install-url: ${{ TEST_PYPI_INSTALL_URL }}
           version-override: ${{ steps.version.outputs.version }}
           pypi-token: ${{ secrets.TEST_PYPI_API_TOKEN }}
