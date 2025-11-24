@@ -1,0 +1,42 @@
+name: Main Workflow
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  ci:
+    name: CI lint, type, test, build
+    uses: ./.github/workflows/reusable-ci.yml
+
+  security:
+    name: Security scans
+    permissions:
+      security-events: write
+      actions: read
+      contents: read
+      packages: read
+    uses: ./.github/workflows/reusable-security.yml
+
+  docs:
+    name: Deploy Documentation
+    permissions:
+      contents: write
+      pages: write
+      id-token: write
+    if: | # Only run docs if documentation files change
+      contains(github.event.head_commit.modified, 'docs/') ||
+      contains(github.event.head_commit.modified, 'README.md') ||
+      contains(github.event.head_commit.modified, 'CONTRIBUTING.md') ||
+      contains(github.event.head_commit.modified, 'mkdocs.yml')
+    uses: ./.github/workflows/reusable-docs.yml
+
+  cd-dev:
+    name: CD Dev Publishing
+    needs: [ci, security, docs]
+    if: ${{ !cancelled() }}
+    uses: ./.github/workflows/reusable-cd-dev.yml
+    secrets: inherit

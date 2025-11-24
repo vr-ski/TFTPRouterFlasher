@@ -1,9 +1,11 @@
 name: CD - Dev Publishing
 
 on:
-  push:
-    branches: [ main ]
-  workflow_dispatch:
+  workflow_call:
+
+env:
+  TEST_PYPI_UPLOAD_URL: "https://test.pypi.org/legacy/"
+  TEST_PYPI_INSTALL_URL: "https://test.pypi.org/simple/"
 
 jobs:
   publish-dev:
@@ -34,7 +36,8 @@ jobs:
             PATCH=0
           fi
 
-          DEV_VERSION="${MAJOR}.${MINOR}.${PATCH}.dev${{ github.run_number }}"
+          TIMESTAMP=$(date +%Y%m%d%H%M%S)
+          DEV_VERSION="${MAJOR}.${MINOR}.${PATCH}.dev${TIMESTAMP}"
 
           echo "Dev version: $DEV_VERSION"
           echo "version=$DEV_VERSION" >> $GITHUB_OUTPUT
@@ -42,7 +45,7 @@ jobs:
       - name: Build and publish to TestPyPI
         uses: ./.github/actions/build-and-publish
         with:
-          pypi-upload-url: 'https://test.pypi.org/legacy/'
-          pypi-install-url: 'https://test.pypi.org/simple/'
+          pypi-upload-url: ${{ env.TEST_PYPI_UPLOAD_URL }}
+          pypi-install-url: ${{ env.TEST_PYPI_INSTALL_URL }}
           version-override: ${{ steps.version.outputs.version }}
           pypi-token: ${{ secrets.TEST_PYPI_API_TOKEN }}
