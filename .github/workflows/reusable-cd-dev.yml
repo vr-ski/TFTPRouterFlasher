@@ -31,7 +31,7 @@ jobs:
             -d ":action=remove" \
             -d "name=${{ env.PACKAGE_NAME }}" \
             -d "version=${{ env.VERSION }}" \
-            "${TEST_PYPI_UPLOAD_URL}" || echo "Package didn't exist or delete failed - continuing"
+            "${env.TEST_PYPI_UPLOAD_URL}" || echo "Package didn't exist or delete failed - continuing"
 
       - name: Calculate dev version
         id: version
@@ -62,7 +62,7 @@ jobs:
       - name: Build and publish to TestPyPI
         uses: ./.github/actions/build-and-publish
         with:
-          pypi-upload-url: ${{ TEST_PYPI_UPLOAD_URL }}
-          pypi-install-url: ${{ TEST_PYPI_INSTALL_URL }}
+          pypi-upload-url: ${{ env.TEST_PYPI_UPLOAD_URL }}
+          pypi-install-url: ${{ env.TEST_PYPI_INSTALL_URL }}
           version-override: ${{ steps.version.outputs.version }}
           pypi-token: ${{ secrets.TEST_PYPI_API_TOKEN }}
