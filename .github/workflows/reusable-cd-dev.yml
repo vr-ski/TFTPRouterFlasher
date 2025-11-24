@@ -24,7 +24,8 @@ jobs:
         id: package-info
         run: |
           PACKAGE_NAME=$(python -c "import tomllib; print(tomllib.load(open('pyproject.toml', 'rb'))['project']['name'])")
-          VERSION=$(python -c "import setuptools_scm; print(setuptools_scm.get_version())")
+          LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "0.0.0")
+          VERSION=${LATEST_TAG#v}
           echo "PACKAGE_NAME=$PACKAGE_NAME" >> $GITHUB_ENV
           echo "VERSION=$VERSION" >> $GITHUB_ENV
       - name: Delete existing package from Test PyPI (if exists)
