@@ -28,7 +28,10 @@ jobs:
           VERSION=${LATEST_TAG#v}
           echo "PACKAGE_NAME=$PACKAGE_NAME" >> $GITHUB_ENV
           echo "VERSION=$VERSION" >> $GITHUB_ENV
+
       - name: Delete existing package from Test PyPI (if exists)
+        env:
+          ACTIONS_STEP_DEBUG: true
         run: |
           # This will fail gracefully if the package doesn't exist
           curl -f -X DELETE \
@@ -36,7 +39,7 @@ jobs:
             -d ":action=remove" \
             -d "name=${{ env.PACKAGE_NAME }}" \
             -d "version=${{ env.VERSION }}" \
-            "${{ env.TEST_PYPI_UPLOAD_URL }}" || echo "Package didn't exist or delete failed - continuing"
+            "${{ env.TEST_PYPI_UPLOAD_URL }}"
 
       - name: Calculate dev version
         id: version
