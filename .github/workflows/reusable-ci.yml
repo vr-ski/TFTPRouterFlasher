@@ -59,14 +59,33 @@ jobs:
       fail-fast: false
     steps:
       - name: Checkout code
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - uses: ./.github/actions/setup-python
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Run tests with coverage
+      - name: Run tests
         run: pytest
+
+  coverage:
+    needs: [unit-tests]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - uses: ./.github/actions/setup-python
+        with:
+          python-version: "3.11"
+
+      - name: Run tests with coverage
+        run: pytest --cov=./ --cov-report=xml
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
 
   build-package:
     runs-on: ${{ matrix.os }}
@@ -88,7 +107,7 @@ jobs:
         run: pip install dist/*.whl
 
   aggregate-results:
-    needs: [ruff-check, ruff-format, mypy, unit-tests, build-package ]
+    needs: [ruff-check, ruff-format, mypy, unit-tests, coverage, build-package ]
     runs-on: ubuntu-latest
     outputs:
       overall-success: ${{ steps.aggregate.outputs.overall-success }}
