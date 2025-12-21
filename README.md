@@ -1,15 +1,14 @@
 # TFTP Router Flasher
 | Badges |
 |--------|
+| ![PyPI](https://img.shields.io/pypi/v/tftp-router-flasher) |
 | ![License](https://img.shields.io/github/license/vr-ski/TFTPRouterFlasher) |
 | ![Repo Size](https://img.shields.io/github/repo-size/vr-ski/TFTPRouterFlasher) |
 | ![Supported Python versions](https://img.shields.io/pypi/pyversions/tftp-router-flasher) |
-| ![CI](https://github.com/vr-ski/TFTPRouterFlasher/actions/workflows/reusable-ci.yml/badge.svg) |
 | ![CD](https://github.com/vr-ski/TFTPRouterFlasher/actions/workflows/reusable-cd-dev.yml/badge.svg) |
 | ![Security Scan](https://github.com/vr-ski/TFTPRouterFlasher/actions/workflows/schedule-security.yml/badge.svg) |
-| ![PyPI](https://img.shields.io/pypi/v/tftp-router-flasher) |
+| ![CI](https://github.com/vr-ski/TFTPRouterFlasher/actions/workflows/reusable-ci.yml/badge.svg) |
 | ![Coverage](https://img.shields.io/codecov/c/github/vr-ski/TFTPRouterFlasher) |
-
 **TFTP Router Flasher** is a cross-platform command-line tool for flashing firmware to routers using the TFTP protocol. It is designed to assist in firmware recovery for routers that support TFTP-based rescue modes, such as many ASUS RT-series models.
 
 This tool is a modern rewrite of the original [arescue](https://github.com/jnissin/arescue) script by [Joonas Nissinen](https://github.com/jnissin). It has been updated for Python 3, refactored for clarity, and packaged as a CLI utility with improved logging, interface detection, and dependency management.
