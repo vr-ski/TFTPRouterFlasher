@@ -1,3 +1,5 @@
+# This workflow is managed by gh actions-lock.
+
 name: CD - Dev Publishing
 
 on:
@@ -13,7 +15,7 @@ jobs:
     environment: test-pypi
     steps:
       - name: Checkout code
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7.0.1
 
       - name: Calculate dev version
         id: version
