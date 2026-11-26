@@ -1,0 +1,123 @@
+# This workflow is managed by gh actions-lock.
+
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Tag name to release (e.g. v1.2.3). Must already exist.'
+        required: true
+        type: string
+      pypi_target:
+        description: 'PyPI target (none = skip PyPI)'
+        required: true
+        default: 'none'
+        type: choice
+        options: [none, test, production]
+      build_deb:
+        description: 'Build Debian package?'
+        required: true
+        default: true
+        type: boolean
+      draft_release:
+        description: 'Create GitHub Release as draft?'
+        required: true
+        default: false
+        type: boolean
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    outputs:
+      version:          ${{ steps.split.outputs.version }}
+      tag:              ${{ steps.split.outputs.tag }}
+      pypi_enabled:     ${{ steps.split.outputs.pypi_enabled }}
+      pypi_repo_url:    ${{ steps.split.outputs.pypi_repo_url }}
+      pypi_install_url: ${{ steps.split.outputs.pypi_install_url }}
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          fetch-depth: 0
+
+      - name: Verify tag and compute routing
+        id: split
+        shell: bash
+        run: |
+          TAG="${{ inputs.version }}"
+
+          if ! git rev-parse --verify "refs/tags/${TAG}" >/dev/null 2>&1; then
+            echo "::error::Tag '${TAG}' does not exist. Push it first, then re-run."
+            exit 1
+          fi
+
+          VERSION="${TAG#v}"
+          TARGET="${{ inputs.pypi_target }}"
+
+          case "$TARGET" in
+            none)
+              PYPI_ENABLED=false
+              REPO_URL=""
+              INSTALL_URL=""
+              ;;
+            test)
+              PYPI_ENABLED=true
+              REPO_URL="https://test.pypi.org/legacy/"
+              INSTALL_URL="https://test.pypi.org/simple/"
+              ;;
+            production)
+              PYPI_ENABLED=true
+              REPO_URL="https://upload.pypi.org/legacy/"
+              INSTALL_URL="https://pypi.org/simple/"
+              ;;
+            *)
+              echo "::error::Unknown pypi_target '${TARGET}'"
+              exit 1
+              ;;
+          esac
+
+          {
+            echo "tag=${TAG}"
+            echo "version=${VERSION}"
+            echo "pypi_enabled=${PYPI_ENABLED}"
+            echo "pypi_repo_url=${REPO_URL}"
+            echo "pypi_install_url=${INSTALL_URL}"
+          } >> "$GITHUB_OUTPUT"
+
+  pypi:
+    needs: prepare
+    if: needs.prepare.outputs.pypi_enabled == 'true'
+    uses: $/.github/workflows/reusable-pypi-publish.yml
+    with:
+      version:        ${{ needs.prepare.outputs.version }}
+      repository-url: ${{ needs.prepare.outputs.pypi_repo_url }}
+      install-url:    ${{ needs.prepare.outputs.pypi_install_url }}
+      environment-name: ${{ inputs.pypi_target == 'test' && 'test-pypi' || 'pypi' }}
+    secrets:
+      PYPI_API_TOKEN: ${{ inputs.pypi_target == 'test' && secrets.TEST_PYPI_API_TOKEN || secrets.PYPI_API_TOKEN }}
+
+  deb:
+    needs: prepare
+    if: inputs.build_deb
+    uses: $/.github/workflows/reusable-deb-build.yml
+    with:
+      version: ${{ needs.prepare.outputs.version }}
+
+  release:
+    needs: [prepare, pypi, deb]
+    if: |
+      always() && !cancelled() &&
+      needs.prepare.result == 'success' &&
+      (needs.prepare.outputs.pypi_enabled == 'false' || needs.pypi.result == 'success') &&
+      (inputs.build_deb == false || needs.deb.result == 'success')
+    permissions:
+      contents: write
+    uses: $/.github/workflows/reusable-github-release.yml
+    with:
+      version:        ${{ needs.prepare.outputs.version }}
+      tag:            ${{ needs.prepare.outputs.tag }}
+      draft:          ${{ inputs.draft_release }}
+      pypi_published: ${{ needs.prepare.outputs.pypi_enabled == 'true' }}
+      deb_attached:   ${{ inputs.build_deb && needs.deb.result == 'success' }}
+      package_name:   tftp_router_flasher
+    secrets: inherit

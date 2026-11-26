@@ -1,0 +1,59 @@
+# This workflow is managed by gh actions-lock.
+
+name: Debian Package
+
+on:
+  workflow_call:
+    inputs:
+      version:
+        description: 'PEP 440 version (no v prefix)'
+        required: true
+        type: string
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          fetch-depth: 0
+
+      - name: Install Debian build tools
+        run: |
+          sudo apt update
+          sudo apt install -y \
+            build-essential fakeroot devscripts debhelper \
+            dh-python pybuild-plugin-pyproject python3-pytest python3-pytest-cov \
+            python3-all python3-setuptools python3-setuptools-scm python3-psutil
+
+      - name: Render changelog from template
+        env:
+          VERSION: ${{ inputs.version }}
+          MAINTAINER: ${{ vars.DEB_MAINTAINER_EMAIL }}
+        run: |
+          DATE=$(date -R)
+          sed -e "s|@VERSION@|${VERSION}|g" \
+              -e "s|@DATE@|${DATE}|g" \
+              -e "s|@MAINTAINER@|<${MAINTAINER}>|g" \
+              debian/changelog.in > debian/changelog
+          echo "───────── debian/changelog ─────────"
+          cat debian/changelog
+          echo "────────────────────────────────────"
+
+      - name: Build .deb
+        env:
+          SETUPTOOLS_SCM_PRETEND_VERSION: ${{ inputs.version }}
+        run: dpkg-buildpackage -us -uc -b
+
+      - name: Collect artifacts
+        run: |
+          mkdir -p "${GITHUB_WORKSPACE}/artifacts"
+          mv ../*.deb "${GITHUB_WORKSPACE}/artifacts/"
+
+      - name: Upload .deb
+        uses: actions/upload-artifact@v7.0.2
+        with:
+          name: deb-package
+          path: artifacts/*.deb
+          if-no-files-found: error
+          retention-days: 7

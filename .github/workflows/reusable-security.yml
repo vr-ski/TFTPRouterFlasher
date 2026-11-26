@@ -16,7 +16,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v7.0.1
 
-      - uses: ./.github/actions/setup-python
+      - uses: $/.github/actions/setup-python
         with:
           python-version: "3.11"
           requirements: ".[security]"
@@ -30,7 +30,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v7.0.1
 
-      - uses: ./.github/actions/setup-python
+      - uses: $/.github/actions/setup-python
         with:
           python-version: "3.11"
           requirements: ".[security]"

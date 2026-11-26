@@ -36,9 +36,52 @@ jobs:
       contains(github.event.head_commit.modified, 'mkdocs.yml')
     uses: ./.github/workflows/reusable-docs.yml
 
+  calculate-version:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7.0.1
+        with:
+          fetch-depth: 0
+
+      - name: Calculate dev version
+        id: version
+        shell: bash
+        run: |
+          # Get latest tag or default to 0.0.0
+          LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "0.0.0")
+          printf "Latest tag: ${LATEST_TAG}\n"
+
+          # Remove 'v' prefix if present
+          LATEST_TAG=${LATEST_TAG#v}
+
+          # Parse version components
+          IFS='.' read -r MAJOR MINOR PATCH <<< "${LATEST_TAG}"
+
+          # If no tags found, default to 0.0.0
+          if [ -z "${MAJOR}" ]; then
+            MAJOR=0
+            MINOR=0
+            PATCH=0
+          fi
+
+          TIMESTAMP=$(date +%Y%m%d%H%M%S)
+          DEV_VERSION="${MAJOR}.${MINOR}.${PATCH}.dev${TIMESTAMP}"
+
+          printf "Dev version: ${DEV_VERSION}\n"
+          printf "version=${DEV_VERSION}" >> "${GITHUB_OUTPUT}"
+
   cd-dev:
     name: CD Dev Publishing
-    needs: [ci, security, docs]
+    needs: [ci, security, docs, calculate-version]
     if: ${{ !cancelled() }}
-    uses: ./.github/workflows/reusable-cd-dev.yml
-    secrets: inherit
+    uses: $/.github/workflows/reusable-pypi-publish.yml
+    with:
+      version:        ${{ needs.calculate-version.outputs.version }}
+      repository-url: https://test.pypi.org/legacy/
+      install-url:    https://test.pypi.org/simple/
+      environment-name: test-pypi
+    secrets:
+      PYPI_API_TOKEN: ${{ secrets.TEST_PYPI_API_TOKEN }}

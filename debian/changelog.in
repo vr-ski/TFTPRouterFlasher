@@ -1,0 +1,5 @@
+tftp-router-flasher (@VERSION@) unstable; urgency=medium
+
+  * Automated release @VERSION@.
+
+ -- TFTP Router Flasher Maintainer @MAINTAINER@  @DATE@

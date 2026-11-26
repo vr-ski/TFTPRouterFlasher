@@ -1,0 +1,83 @@
+# This workflow is managed by gh actions-lock.
+
+name: GitHub Release
+
+on:
+  workflow_call:
+    inputs:
+      version:
+        description: 'PEP 440 version (no v prefix)'
+        required: true
+        type: string
+      tag:
+        description: 'Git tag name (e.g. v1.2.3)'
+        required: true
+        type: string
+      draft:
+        required: true
+        type: boolean
+      pypi_published:
+        required: true
+        type: boolean
+      deb_attached:
+        required: true
+        type: boolean
+      package_name:
+        required: true
+        type: string
+
+env:
+  PACKAGE_NAME: ${{ inputs.package_name }}
+
+jobs:
+  create:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7.0.1
+
+      - name: Download Debian artifact
+        if: inputs.deb_attached
+        uses: actions/download-artifact@v8.0.2
+        with:
+          name: deb-package
+          path: artifacts
+
+      - name: Assemble release notes
+        run: |
+          VERSION="${{ inputs.version }}"
+          REPO="https://github.com/${{ github.repository }}"
+
+          {
+            if [[ "${{ inputs.pypi_published }}" == "true" ]]; then
+              printf "### PyPI"
+              printf "Published: https://pypi.org/project/${PACKAGE_NAME}/${VERSION}/\n\n"
+            fi
+            if [[ "${{ inputs.deb_attached }}" == "true" ]]; then
+              printf "### Debian Package\n"
+              for f in artifacts/*.deb; do
+                [[ -e "${f}" ]] || continue
+                echo "- [\`$(basename "${f}")\`](${REPO}/releases/download/${{ inputs.tag }}/$(basename "${f}"))"
+              done
+              printf "\n"
+            fi
+            printf "---\n_Built from commit ${{ github.sha }}_\n"
+          } | tee release-notes.md
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          DRAFT_FLAG=""
+          [[ "${{ inputs.draft }}" == "true" ]] && DRAFT_FLAG="--draft"
+
+          ASSETS=()
+          while IFS= read -r -d '' f; do
+            ASSETS+=("${f}")
+          done < <(find artifacts -name '*.deb' -print0 2>/dev/null)
+
+          gh release create "${{ inputs.tag }}" \
+            ${DRAFT_FLAG} \
+            --target "${{ github.sha }}" \
+            --title "${{ github.event.repository.name }} ${{ inputs.tag }}" \
+            --notes-file release-notes.md \
+            "${ASSETS[@]}"

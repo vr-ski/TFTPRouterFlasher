@@ -1,0 +1,16 @@
+#!/usr/bin/make -f
+
+%:
+	dh $@ --with python3 --buildsystem=pybuild
+
+# Tests are run in reusable-ci.yml; not in the .deb build.
+override_dh_auto_test:
+	true
+
+# tftpy is not packaged for Python 3 in Debian. Bundle it.
+override_dh_auto_install:
+	dh_auto_install
+	mkdir -p debian/tftp-router-flasher/usr/lib/python3/dist-packages
+	pip3 install --no-deps --no-cache-dir --target \
+	    debian/tftp-router-flasher/usr/lib/python3/dist-packages \
+	    'tftpy==0.8.6'

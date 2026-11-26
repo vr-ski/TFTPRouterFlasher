@@ -1,0 +1,23 @@
+Source: tftp-router-flasher
+Section: python
+Priority: optional
+Maintainer: vr-ski <vr.ski.oss@protonmail.com>
+Build-Depends:
+ debhelper-compat (= 13),
+ dh-python,
+ pybuild-plugin-pyproject,
+ python3-all,
+ python3-setuptools,
+ python3-setuptools-scm,
+ python3-pytest,
+ python3-psutil,
+Rules-Requires-Root: no
+Standards-Version: 4.7.4.1
+Homepage: https://github.com/vr-ski/TFTPRouterFlasher
+
+Package: tftp-router-flasher
+Architecture: all
+Depends: ${python3:Depends}, ${misc:Depends}, python3-psutil
+X-Python3-Version: >= 3.8
+Description: TFTP router firmware flasher
+ Command-line tool for flashing router firmware via TFTP.
